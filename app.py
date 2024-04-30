@@ -67,12 +67,21 @@ def edit_book():
 
 @app.route("/display_books", methods=['POST'])
 def display_books():
-  author = request.form['author']
-  library = request.form['library']
-  book_info = get_books(author, library)
+    author = request.form['author']
+    library = request.form['library']
+    book_info, total_books = get_books(author, library)
 
-  # Assuming you have a display.html template where you want to show the results
-  return render_template("display.html", book_info=book_info)
+    # Calculate percentage of books by author in the library
+    author_books_count = len(book_info)
+    percentage = (author_books_count / total_books) * 100 if total_books > 0 else 0
+
+    # Prepare data for the pie chart
+    labels = ['Books by Author', 'Other Books']
+    values = [author_books_count, total_books - author_books_count]
+
+    return render_template("display.html", book_info=book_info, total_books=total_books,
+                           author_books_count=author_books_count, percentage=percentage,
+                           labels=labels, values=values, author=author, library=library)
 
 
 @app.route("/delete")
@@ -92,4 +101,5 @@ def display():
 
 if __name__ == '__main__':        
   app.run(host='0.0.0.0', debug=True)
+
 

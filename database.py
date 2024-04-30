@@ -1,18 +1,34 @@
 import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import IntegrityError
 
-engine = create_engine(
-    "mysql+pymysql://victordelunap:G9WWXqUuFS8FlPGA4Pmg@cs348db.cpg8a8mounod.us-east-2.rds.amazonaws.com:3306/cs348db?charset=utf8mb4"
+
+db_connection_string = "mysql+pymysql://victordelunap:G9WWXqUuFS8FlPGA4Pmg@cs348db.cpg8a8mounod.us-east-2.rds.amazonaws.com:3306/cs348db?charset=utf8mb4"
+
+
+# Create the SQLAlchemy engine with the specified isolation level
+engine = create_engine(º
+    db_connection_string,
+    connect_args={
+        "ssl": {
+            "ssl_ca": ""
+        }
+    },
+    isolation_level="REPEATABLE READ"
 )
 
 Session = sessionmaker(bind=engine)
 
 
+
+
+
+
+
 def upload_book(title, author, library, num_pages, genre, taken, release_date):
   with Session.begin() as session:
       try:
+          session.execute(text("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE"))
           session.execute(
               text(
                   "INSERT INTO Book (title, author, library, num_pages, genre, taken, release_date) VALUES (:title, :author, :library, :num_pages, :genre, :taken, :release_date)"
@@ -59,6 +75,7 @@ def upload_book(title, author, library, num_pages, genre, taken, release_date):
 
 def erase_book(title, author, library):
   with Session.begin() as session:
+    session.execute(text("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE"))
     session.execute(
         text(
             "DELETE FROM Book WHERE title = :title AND author = :author AND library = :library"
@@ -94,6 +111,7 @@ def erase_book(title, author, library):
 
 def update_book(title, author, library, num_pages, genre, taken, release_date):
   with Session.begin() as session:
+      session.execute(text("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE"))
       # Prepare the SQL UPDATE statement
       update_statement = "UPDATE Book SET "
       update_fields = []
@@ -136,9 +154,18 @@ def get_books(author, library):
           WHERE author = :author AND library = :library
       """)
 
+      total_books_query = text("""
+          SELECT COUNT(*) FROM Book 
+          WHERE library = :library
+      """)
+
       result = session.execute(books_query, {"author": author, "library": library}).fetchall()
+      total_books_result = session.execute(total_books_query, {"library": library}).fetchone()
+
       books = [{"title": row[0], "num_pages": row[1], "release_date": row[2]} for row in result]
-      return books
+      total_books = total_books_result[0] if total_books_result else 0
+
+      return books, total_books
 
 
 def get_num_books(library):
@@ -153,3 +180,29 @@ def get_num_books(library):
           return result[0]  # Return the value of the num_books column
       else:
           return None  # Or handle the case when no result is found
+
+def get_average_books_by_author_in_library(author, library):
+  with engine.connect() as connection:
+      result = connection.execute(
+          """
+          SELECT AVG(count) FROM (
+              SELECT COUNT(*) as count FROM Book 
+              WHERE author = :author AND library = :library
+              GROUP BY library
+          ) as counts
+          """,
+          {"author": author, "library": library}
+      ).fetchone()
+      return result[0] if result else 0
+
+def get_total_books_in_library(library):
+  with engine.connect() as connection:
+      result = connection.execute(
+          "SELECT num_books FROM Library WHERE libname = :library", {'library': library}).fetchone()
+      return result[0] if result else 0
+
+def get_books_by_author_across_libraries(author):
+  with engine.connect() as connection:
+      result = connection.execute(
+          "SELECT COUNT(*) FROM Book WHERE author = :author", {'author': author}).fetchone()
+      return result[0] if result else 0

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>CS348 Project</title>
   <meta charset="utf-8">
@@ -7,152 +8,176 @@
   <link rel="stylesheet" type="text/css" href="templates/css/index.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <style>
-    body{
+    body {
       display: flex;
-      justify-content:center;
+      justify-content: center;
       align-items: center;
       min-height: 100vh;
     }
+
     .wrapper {
-      margin-top: 50%px;
-      width: 700px; 
-      background: #2DADE3; 
+      margin-top: 20%;
+      width: 700px;
+      background: #2DADE3;
       border-radius: 20px;
       border-style: solid;
       border-color: #03487E;
     }
 
-    .wrapper h1{
-      font-size: 36px; 
+    .wrapper h1 {
+      font-size: 36px;
       text-align: center;
-      text-decoration: blond; 
+      text-decoration: none;
       color: #03487E;
-      margin: 10px; 
-
+      margin: 10px;
     }
 
-    .wrapper h2{
-      font-size: 28px; 
+    .wrapper h2 {
+      font-size: 28px;
       font-style: italic;
       color: #03487E;
-      text-align: center; 
+      text-align: center;
       margin: 10px;
-
     }
-    
-    .wrapper h3{
-      font-size: 20px; 
+
+    .wrapper h3 {
+      font-size: 20px;
       font-style: italic;
       color: #03487E;
-      text-align: center; 
+      text-align: center;
       margin: 10px;
-
     }
 
     .button {
       border: none;
       color: white;
-      padding:10px 20px;
+      padding: 10px 20px;
       text-align: center;
       display: flex;
       font-size: 16px;
       transition-duration: 0.4s;
-      cursor:pointer;
+      cursor: pointer;
       border-radius: 12px;
-      background-color:#B7DBF7; 
-      color: black; 
+      background-color: #B7DBF7;
+      color: black;
       border: 2px solid black;
-      margin-left: 370px; 
-      margin-top: 30px; 
-      margin-bottom: 30px; 
+      margin-left: 370px;
+      margin-top: 30px;
+      margin-bottom: 30px;
       width: 20%;
-      }
-
+    }
 
     .button:hover {
       background-color: #82A9B9;
       color: white;
     }
-
-
   </style>
+  <!-- Other header content -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 
 <body>
   <div class="container position-relative">
     <div class="wrapper position-absolute top-0 start-50 translate-middle">
-      <div class="header"> 
+      <div class="header">
         <h1>Display Books</h1>
       </div>
 
-      <div class= "content">
+      <div class="content">
         <form method="post" action="/display_books">
           <div class="row g-2 m-4">
-              <div class="col-md">
-                  <div class="mb-1">
-                      <label for="author" class="form-label">Author</label>
-                      <input type="text" class="form-control" id="author" name="author" placeholder="Enter an author">
-                  </div>
+            <div class="col-md">
+              <div class="mb-1">
+                <label for="author" class="form-label">Author</label>
+                <input type="text" class="form-control" id="author" name="author" placeholder="Enter an author">
               </div>
-              <div class="col-md">
-                  <div class="mb-1">
-                      <label for="library" class="form-label">Library</label>
-                      <input type="text" class="form-control" id="library" name="library" placeholder="Enter library name">
-                  </div>
+            </div>
+            <div class="col-md">
+              <div class="mb-1">
+                <label for="library" class="form-label">Library</label>
+                <input type="text" class="form-control" id="library" name="library" placeholder="Enter library name">
               </div>
-          </div>  
+            </div>
+          </div>
 
           <div class="row g-2 m-4">
-              <div class="col-md">
-                  <div class="mb-1">
-                    <button class=" button" type="submit">Find</button>
-                  </div>
+            <div class="col-md">
+              <div class="mb-1">
+                <button class="button" type="submit">Find</button>
               </div>
+            </div>
           </div>
-         
+
         </form>
         <div class="row g-2 m-4">
           <div class="col-md">
             <div class="mb-1">
               <h2>Book List</h2>
               {% if book_info %}
-                  <div class="row">
-                      <div class="col-md-4">
-                          <h3>Title</h3>
-                          <ul>
-                              {% for book in book_info %}
-                                <p><i>{{ book.title }}</i></p>
-                              {% endfor %}
-                          </ul>
-                      </div>
-                      <div class="col-md-4">
-                          <h3>Number of Pages</h3>
-                          <ul>
-                              {% for book in book_info %}
-                                <p>{{ book.num_pages }}</p>
-                              {% endfor %}
-                          </ul>
-                      </div>
-                      <div class="col-md-4">
-                          <h3>Release Date</h3>
-                          <ul>
-                              {% for book in book_info %}
-                                <p>{{ book.release_date.strftime("%Y-%m-%d") }}</p>
-                              {% endfor %}
-                          </ul>
-                      </div>
-                  </div>
+              <div class="row">
+                <div class="col-md-4">
+                  <h3>Title</h3>
+                  <ul>
+                    {% for book in book_info %}
+                    <p><i>{{ book.title }}</i></p>
+                    {% endfor %}
+                  </ul>
+                </div>
+                <div class="col-md-4">
+                  <h3>Number of Pages</h3>
+                  <ul>
+                    {% for book in book_info %}
+                    <p>{{ book.num_pages }}</p>
+                    {% endfor %}
+                  </ul>
+                </div>
+                <div class="col-md-4">
+                  <h3>Release Date</h3>
+                  <ul>
+                    {% for book in book_info %}
+                    <p>{{ book.release_date.strftime("%Y-%m-%d") }}</p>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
               {% else %}
-                  <p>No books found.</p>
+              <p>No books found.</p>
               {% endif %}
+            </div>
+            <div>
+              <h3>Books by Author in Library: {{ author_books_count }} out of {{ total_books }} ({{ percentage }}%)</h3>
+              <div id="myPlot" style="width: 500px; height: 400px; margin: 0 auto;"></div>
             </div>
           </div>
         </div>
-        
+
       </div>
 
     </div>
   </div>
 
 </body>
+
+<script>
+  const labels = {{ labels | safe }};
+  const values = {{ values | safe }};
+  const author = "{{ author | safe }}";
+  const library = "{{ library | safe }}";
+
+  const layout = {
+    title: `${author} books in ${library}`,
+    plot_bgcolor: "#2DADE3",
+    paper_bgcolor: "#2DADE3",
+  };
+
+  const data = [{
+    labels: labels,
+    values: values,
+    type: "pie"
+  }];
+
+  Plotly.newPlot("myPlot", data, layout);
+</script>
+
 </html>
+
