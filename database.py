@@ -7,7 +7,7 @@ db_connection_string = "mysql+pymysql://victordelunap:G9WWXqUuFS8FlPGA4Pmg@cs348
 
 
 # Create the SQLAlchemy engine with the specified isolation level
-engine = create_engine(º
+engine = create_engine(
     db_connection_string,
     connect_args={
         "ssl": {
